@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="New-memo create">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <title>new</title>
+</head>
+<body>
+  <header>
+    <h1>新規作成</h1>
+  </header>
+  <main>
+    <form action="/memos" accept-charset="UTF-8" method="post">
+      <div class="form-items">
+          <label for="new-title">タイトル</label>
+          <input type="text" name="new_title" placeholder="タイトルを入力">
+
+          <label for="new-content">内容</label>
+          <textarea name="new_content"></textarea>
+      </div>
+      <div class="form-action">
+        <input type="submit" value="追加">
+      </div>
+    </form>
+  </main>
+  <div class="moval-link">
+    <a href="/memos">Back to memos</a>
+  </div>
+</body>
+</html>
