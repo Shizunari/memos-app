@@ -17,19 +17,19 @@ Gem
 
 ## インストール手順(Installation)
 1. リポジトリをダウンロード（クローン）します。
-   ```bash
+   ```
    git clone https://github.com/Shizunari/memos-app
    ```
 2. プロジェクトのフォルダに移動します。
-   ```bash
+   ```
    cd リポジトリ名
    ```
 3. 必要なライブラリをインストールします。
-   ```bash
+   ```
    bundle install
    ```
 4. データベースの準備をします。
-   ```bash
+   ```
    bundle exec ruby memos_app.rb -p 4567
    ```
    Localhost以外で使用する場合には、引数で接続範囲を指定（-h 0.0.0.0）
@@ -37,7 +37,7 @@ Gem
 
 ## 使い方（Usage）
 1. プロジェクトのフォルダで次のコマンドを使用しWEBサーバを起動します
-   ```bash
+   ```
    bundle exec ruby memos_app.rb -p 4567
    ```
    Localhost以外で使用する場合には、引数で接続範囲を指定（-h 0.0.0.0）
