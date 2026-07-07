@@ -5,5 +5,5 @@ source "https://rubygems.org"
 gem 'rackup'
 gem 'sinatra'
 gem 'webrick'
-gem 'rubocop', require: false
+gem 'rubocop-fjord', require: false
 gem 'erb_lint', require: false

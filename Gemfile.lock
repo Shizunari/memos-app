@@ -97,6 +97,13 @@ GEM
     rubocop-ast (1.49.1)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
+    rubocop-fjord (0.4.0)
+      rubocop (>= 1.0)
+      rubocop-performance
+    rubocop-performance (1.26.1)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.75.0, < 2.0)
+      rubocop-ast (>= 1.47.1, < 2.0)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     sinatra (4.2.1)
@@ -122,7 +129,7 @@ PLATFORMS
 DEPENDENCIES
   erb_lint
   rackup
-  rubocop
+  rubocop-fjord
   sinatra
   webrick
 
@@ -163,6 +170,8 @@ CHECKSUMS
   regexp_parser (2.12.0) sha256=35a916a1d63190ab5c9009457136ae5f3c0c7512d60291d0d1378ba18ce08ebb
   rubocop (1.88.1) sha256=726af773d6bc169ed3ff852f3ca020b7c58d39c34e7a8d879a8e0147cc994f26
   rubocop-ast (1.49.1) sha256=4412f3ee70f6fe4546cc489548e0f6fcf76cafcfa80fa03af67098ffed755035
+  rubocop-fjord (0.4.0) sha256=5937e4ebd97e315c609aa6ed867cde2dbeb4de2c0245d1a42b35e9c81e03ced3
+  rubocop-performance (1.26.1) sha256=cd19b936ff196df85829d264b522fd4f98b6c89ad271fa52744a8c11b8f71834
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   sinatra (4.2.1) sha256=b7aeb9b11d046b552972ade834f1f9be98b185fa8444480688e3627625377080

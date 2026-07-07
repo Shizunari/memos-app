@@ -3,14 +3,16 @@
 require 'sinatra'
 require 'json'
 require 'rack/protection'
+require 'securerandom'
 
-use Rack::Protection::EscapedParams
 use Rack::Protection
+set :erb, escape_html: true
 
 Dir.mkdir('resources') unless Dir.exist?('resources')
 
 get '/memos' do
-  @articles = Dir.glob('resources/*.json').map do |filepath|
+  file_names = Dir.glob('resources/*.json').sort_by { |f| File.birthtime(f) }
+  @articles = file_names.map do |filepath|
     id = File.basename(filepath, '.json')
     article_content = File.read(filepath)
     article = JSON.parse(article_content)
@@ -27,7 +29,9 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  filename = "resources/#{Time.now.strftime('%Y%m%d%H%M%S')}.json"
+  filename = "resources/#{SecureRandom.hex(16)}.json"
+  filename = "resources/#{SecureRandom.hex(16)}.json" while File.exist?(filename)
+
   data_content = {
     title: params[:new_title],
     content: params[:new_content]
