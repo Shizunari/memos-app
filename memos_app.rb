@@ -42,7 +42,8 @@ post '/memos' do
 end
 
 get '/memos/:id' do
-  @id = params['id']
+  @id = File.basename(params['id'].to_s)
+  abort '不正な処理です。' unless @id =~ /\A[a-zA-Z0-9]+\z/
   file_path = "resources/#{@id}.json"
   article_content = File.read(file_path)
   @article = JSON.parse(article_content)
@@ -51,7 +52,8 @@ get '/memos/:id' do
 end
 
 get '/memos/:id/edit' do
-  @id = params['id']
+  @id = File.basename(params['id'].to_s)
+  abort '不正な処理です。' unless @id =~ /\A[a-zA-Z0-9]+\z/
   file_path = "resources/#{@id}.json"
   article_content = File.read(file_path)
   @article = JSON.parse(article_content)
@@ -60,7 +62,9 @@ get '/memos/:id/edit' do
 end
 
 patch '/memos/:id' do
-  filename = "resources/#{params['id']}.json"
+  safe_id = File.basename(params['id'].to_s)
+  abort '不正な処理です。' unless safe_id =~ /\A[a-zA-Z0-9]+\z/
+  filename = "resources/#{safe_id}.json"
   data_content = {
     title: params[:edit_title],
     content: params[:edit_content]
@@ -71,7 +75,9 @@ patch '/memos/:id' do
 end
 
 delete '/memos/:id' do
-  filename = "resources/#{params['id']}.json"
+  safe_id = File.basename(params['id'].to_s)
+  abort '不正な処理です。' unless safe_id =~ /\A[a-zA-Z0-9]+\z/
+  filename = "resources/#{safe_id}.json"
   File.delete(filename)
 
   redirect '/memos'
