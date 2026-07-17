@@ -58,6 +58,8 @@ get '/memos/:id' do
   halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9]+\z/
 
   file_name = "#{File.join(DATA_AREA, @id)}.json"
+  halt 404 unless File.exist?(file_name)
+
   @article = JSON.load_file(file_name)
   @page_title = '個別表示'
 
@@ -71,6 +73,8 @@ get '/memos/:id/edit' do
   halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9]+\z/
 
   file_name = "#{File.join(DATA_AREA, @id)}.json"
+  halt 404 unless File.exist?(file_name)
+
   @article = JSON.load_file(file_name)
   @page_title = '編集画面'
 
