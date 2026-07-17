@@ -1,7 +1,8 @@
+# アプリの作成データを除外
+resources/
+
 # VSCodeの隠しフォルダごと除外
 .ruby-lsp/
-
-
 
 # macOS.gitignore ****************************
 

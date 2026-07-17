@@ -1,29 +1,16 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Home window">
-  <link rel="stylesheet" href="/assets/css/style.css">
-  <title>index</title>
-</head>
-<body>
-  <header>
-    <div class="twin-header">
-      <h1>Memoアプリ</h1>
-      <a class="btn01" href="/memos/new">新規追加</a>
-    </div>
-  </header>
-
-  <main>
-    <div class="index-article">
-    <% @articles.each_with_index do |article, i| %>
-      <a href="/memos/<%= article[:id] %>"><p><%= i + 1 %></p></a>
-      <p>タイトル: <%= article[:title] %></p>
-      <p>内容: <%= article[:content] %></p>
-    <% end %>
+<header>
+  <div class="twin-header">
+    <h1>Memoアプリ</h1>
+    <a class="add-btn" href="/memos/new">新規追加</a>
   </div>
-  </main>
+</header>
 
-</body>
-</html>
+<main>
+  <div class="index-article">
+  <% @articles.each.with_index(1) do |article, i| %>
+    <p><a href="/memos/<%= article[:id] %>"><%= i %></a></p>
+    <p>タイトル: <%= article[:title] %></p>
+    <p>内容: <%= article[:content] %></p>
+  <% end %>
+  </div>
+</main>

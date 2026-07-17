@@ -5,33 +5,43 @@ require 'json'
 require 'rack/protection'
 require 'securerandom'
 
-use Rack::Protection
-set :erb, escape_html: true
+DATA_AREA = 'resources'
 
-Dir.mkdir('resources') unless Dir.exist?('resources')
+configure do
+  enable :sessions
+  set :session_secret, ENV.fetch('SESSION_SECRET', SecureRandom.hex(64))
+
+  use Rack::Protection
+  set :erb, escape_html: true
+end
+
+Dir.mkdir(DATA_AREA) unless Dir.exist?(DATA_AREA)
+
+def load_articles
+  file_names = Dir.glob(File.join(DATA_AREA, '*.json')).sort_by { |f| File.birthtime(f) }
+  file_names.map do |file_name|
+    id = File.basename(file_name, '.json')
+    article_json = JSON.load_file(file_name)
+    { id:, title: article_json['title'], content: article_json['content'] }
+  end
+end
 
 get '/memos' do
-  file_names = Dir.glob('resources/*.json').sort_by { |f| File.birthtime(f) }
-  @articles = file_names.map do |filepath|
-    id = File.basename(filepath, '.json')
-    article_content = File.read(filepath)
-    article = JSON.parse(article_content)
-    title = article['title']
-    content = article['content']
-    { id: id, title: title, content: content }
-  end
+  @articles = load_articles
+  @page_title = '一覧表示'
 
   erb :index
 end
 
 get '/memos/new' do
+  @page_title = '新規作成'
+
   erb :new
 end
 
 post '/memos' do
-  filename = "resources/#{SecureRandom.hex(16)}.json"
-  filename = "resources/#{SecureRandom.hex(16)}.json" while File.exist?(filename)
-
+  filename = "#{File.join(DATA_AREA, SecureRandom.hex(5))}.json"
+  filename = "#{File.join(DATA_AREA, SecureRandom.hex(5))}.json" while File.exist?(filename)
   data_content = {
     title: params[:new_title],
     content: params[:new_content]
@@ -42,43 +52,55 @@ post '/memos' do
 end
 
 get '/memos/:id' do
+  @authenticity_id = SecureRandom.uuid
+  session[:session_authenticity] = @authenticity_id
   @id = File.basename(params['id'].to_s)
-  abort '不正な処理です。' unless @id =~ /\A[a-zA-Z0-9]+\z/
-  file_path = "resources/#{@id}.json"
-  article_content = File.read(file_path)
-  @article = JSON.parse(article_content)
+  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9]+\z/
+
+  file_name = "#{File.join(DATA_AREA, @id)}.json"
+  @article = JSON.load_file(file_name)
+  @page_title = '個別表示'
 
   erb :show
 end
 
 get '/memos/:id/edit' do
+  @authenticity_id = SecureRandom.uuid
+  session[:session_authenticity] = @authenticity_id
   @id = File.basename(params['id'].to_s)
-  abort '不正な処理です。' unless @id =~ /\A[a-zA-Z0-9]+\z/
-  file_path = "resources/#{@id}.json"
-  article_content = File.read(file_path)
-  @article = JSON.parse(article_content)
+  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9]+\z/
+
+  file_name = "#{File.join(DATA_AREA, @id)}.json"
+  @article = JSON.load_file(file_name)
+  @page_title = '編集画面'
 
   erb :edit
 end
 
 patch '/memos/:id' do
+  halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
+
   safe_id = File.basename(params['id'].to_s)
-  abort '不正な処理です。' unless safe_id =~ /\A[a-zA-Z0-9]+\z/
-  filename = "resources/#{safe_id}.json"
+  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9]+\z/
+
+  file_name = "#{File.join(DATA_AREA, safe_id)}.json"
   data_content = {
     title: params[:edit_title],
     content: params[:edit_content]
   }
-  File.write(filename, JSON.generate(data_content))
+  File.write(file_name, JSON.generate(data_content))
 
   redirect "/memos/#{params['id']}"
 end
 
 delete '/memos/:id' do
+  halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
+
   safe_id = File.basename(params['id'].to_s)
-  abort '不正な処理です。' unless safe_id =~ /\A[a-zA-Z0-9]+\z/
-  filename = "resources/#{safe_id}.json"
-  File.delete(filename)
+  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9]+\z/
+
+  file_name = "#{File.join(DATA_AREA, safe_id)}.json"
+  File.delete(file_name)
 
   redirect '/memos'
 end

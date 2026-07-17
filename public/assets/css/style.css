@@ -117,7 +117,7 @@ input[type="submit"]:hover {
   gap: 30px;
 }
 
-.btn02 {
+.edit-btn {
   background-color: #00a3ff;
   border: solid 1px #0c83b5;
   border-radius: 5px;
@@ -131,11 +131,11 @@ input[type="submit"]:hover {
   width: 78px;
 
 }
-.btn02:hover {
+.edit-btn:hover {
   color: #c71585;
 }
 
-.btn01 {
+.add-btn {
   background-color: #00a3ff;
   border: solid 1px #0c83b5;
   border-radius: 5px;
@@ -147,7 +147,7 @@ input[type="submit"]:hover {
   margin-left: 50px;
   vertical-align: bottom;
 }
-.btn01:hover {
+.add-btn:hover {
   color: #c71585;
 }
 
