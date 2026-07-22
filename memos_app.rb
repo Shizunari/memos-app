@@ -17,13 +17,17 @@ end
 
 Dir.mkdir(DATA_AREA) unless Dir.exist?(DATA_AREA)
 
-def load_articles
+def load_articles(file_id = nil)
   file_names = Dir.glob(File.join(DATA_AREA, '*.json')).sort_by { |f| File.birthtime(f) }
-  file_names.map do |file_name|
+  articles = file_names.map do |file_name|
     id = File.basename(file_name, '.json')
     article_json = JSON.load_file(file_name)
     { id:, title: article_json['title'], content: article_json['content'] }
   end
+
+  return articles unless file_id
+
+  articles.find { |article| article[:id] == file_id }
 end
 
 get '/memos' do
@@ -40,13 +44,13 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  filename = "#{File.join(DATA_AREA, SecureRandom.hex(5))}.json"
-  filename = "#{File.join(DATA_AREA, SecureRandom.hex(5))}.json" while File.exist?(filename)
+  file_name = "#{File.join(DATA_AREA, SecureRandom.uuid)}.json"
+  file_name = "#{File.join(DATA_AREA, SecureRandom.uuid)}.json" while File.exist?(file_name)
   data_content = {
     title: params[:new_title],
     content: params[:new_content]
   }
-  File.write(filename, JSON.generate(data_content))
+  File.write(file_name, JSON.generate(data_content))
 
   redirect '/memos'
 end
@@ -55,7 +59,7 @@ get '/memos/:id' do
   @authenticity_id = SecureRandom.uuid
   session[:session_authenticity] = @authenticity_id
   @id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9]+\z/
+  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
 
   file_name = "#{File.join(DATA_AREA, @id)}.json"
   halt 404 unless File.exist?(file_name)
@@ -70,7 +74,7 @@ get '/memos/:id/edit' do
   @authenticity_id = SecureRandom.uuid
   session[:session_authenticity] = @authenticity_id
   @id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9]+\z/
+  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
 
   file_name = "#{File.join(DATA_AREA, @id)}.json"
   halt 404 unless File.exist?(file_name)
@@ -85,9 +89,10 @@ patch '/memos/:id' do
   halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
 
   safe_id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9]+\z/
+  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9-]+\z/
 
-  file_name = "#{File.join(DATA_AREA, safe_id)}.json"
+  article = load_articles(safe_id)
+  file_name = "#{File.join(DATA_AREA, article[:id])}.json"
   data_content = {
     title: params[:edit_title],
     content: params[:edit_content]
@@ -101,9 +106,11 @@ delete '/memos/:id' do
   halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
 
   safe_id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9]+\z/
+  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9-]+\z/
 
-  file_name = "#{File.join(DATA_AREA, safe_id)}.json"
+  article = load_articles(safe_id)
+  file_name = "#{File.join(DATA_AREA, article[:id])}.json"
+
   File.delete(file_name)
 
   redirect '/memos'
