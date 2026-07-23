@@ -88,10 +88,7 @@ end
 patch '/memos/:id' do
   halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
 
-  safe_id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9-]+\z/
-
-  article = load_articles(safe_id)
+  article = load_articles(params['id'].to_s)
   file_name = "#{File.join(DATA_AREA, article[:id])}.json"
   data_content = {
     title: params[:edit_title],
@@ -105,10 +102,7 @@ end
 delete '/memos/:id' do
   halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
 
-  safe_id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if safe_id !~ /\A[a-zA-Z0-9-]+\z/
-
-  article = load_articles(safe_id)
+  article = load_articles(params['id'].to_s)
   file_name = "#{File.join(DATA_AREA, article[:id])}.json"
 
   File.delete(file_name)
