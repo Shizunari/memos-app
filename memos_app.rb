@@ -8,9 +8,6 @@ require 'securerandom'
 DATA_AREA = 'resources'
 
 configure do
-  enable :sessions
-  set :session_secret, ENV.fetch('SESSION_SECRET', SecureRandom.hex(64))
-
   use Rack::Protection
   set :erb, escape_html: true
 end
@@ -56,8 +53,6 @@ post '/memos' do
 end
 
 get '/memos/:id' do
-  @authenticity_id = SecureRandom.uuid
-  session[:session_authenticity] = @authenticity_id
   @id = File.basename(params['id'].to_s)
   halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
 
@@ -71,8 +66,6 @@ get '/memos/:id' do
 end
 
 get '/memos/:id/edit' do
-  @authenticity_id = SecureRandom.uuid
-  session[:session_authenticity] = @authenticity_id
   @id = File.basename(params['id'].to_s)
   halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
 
@@ -86,9 +79,8 @@ get '/memos/:id/edit' do
 end
 
 patch '/memos/:id' do
-  halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
-
   article = load_articles(params['id'].to_s)
+  halt 404 unless article
   file_name = "#{File.join(DATA_AREA, article[:id])}.json"
   data_content = {
     title: params[:edit_title],
@@ -100,9 +92,8 @@ patch '/memos/:id' do
 end
 
 delete '/memos/:id' do
-  halt 400, '不正な処理です。' if session[:session_authenticity] != params[:authenticity_id]
-
   article = load_articles(params['id'].to_s)
+  halt 404 unless article
   file_name = "#{File.join(DATA_AREA, article[:id])}.json"
 
   File.delete(file_name)
