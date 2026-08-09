@@ -42,7 +42,6 @@ end
 
 post '/memos' do
   file_name = "#{File.join(DATA_AREA, SecureRandom.uuid)}.json"
-  file_name = "#{File.join(DATA_AREA, SecureRandom.uuid)}.json" while File.exist?(file_name)
   data_content = {
     title: params[:new_title],
     content: params[:new_content]
@@ -53,8 +52,9 @@ post '/memos' do
 end
 
 get '/memos/:id' do
-  @id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
+  @id = params['id']
+  # @id = File.basename(params['id'].to_s)
+  # halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
 
   file_name = "#{File.join(DATA_AREA, @id)}.json"
   halt 404 unless File.exist?(file_name)
@@ -66,8 +66,9 @@ get '/memos/:id' do
 end
 
 get '/memos/:id/edit' do
-  @id = File.basename(params['id'].to_s)
-  halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
+  @id = params['id']
+  # @id = File.basename(params['id'].to_s)
+  # halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
 
   file_name = "#{File.join(DATA_AREA, @id)}.json"
   halt 404 unless File.exist?(file_name)
