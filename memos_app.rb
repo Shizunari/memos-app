@@ -52,11 +52,7 @@ post '/memos' do
 end
 
 get '/memos/:id' do
-  @id = params['id']
-  # @id = File.basename(params['id'].to_s)
-  # halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
-
-  file_name = "#{File.join(DATA_AREA, @id)}.json"
+  file_name = "#{File.join(DATA_AREA, params['id'])}.json"
   halt 404 unless File.exist?(file_name)
 
   @article = JSON.load_file(file_name)
@@ -66,11 +62,7 @@ get '/memos/:id' do
 end
 
 get '/memos/:id/edit' do
-  @id = params['id']
-  # @id = File.basename(params['id'].to_s)
-  # halt 400, '不正な処理です。' if @id !~ /\A[a-zA-Z0-9-]+\z/
-
-  file_name = "#{File.join(DATA_AREA, @id)}.json"
+  file_name = "#{File.join(DATA_AREA, params['id'])}.json"
   halt 404 unless File.exist?(file_name)
 
   @article = JSON.load_file(file_name)
