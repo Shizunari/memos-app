@@ -52,7 +52,8 @@ post '/memos' do
 end
 
 get '/memos/:id' do
-  file_name = "#{File.join(DATA_AREA, params['id'])}.json"
+  @id = params['id']
+  file_name = "#{File.join(DATA_AREA, @id)}.json"
   halt 404 unless File.exist?(file_name)
 
   @article = JSON.load_file(file_name)
@@ -62,7 +63,8 @@ get '/memos/:id' do
 end
 
 get '/memos/:id/edit' do
-  file_name = "#{File.join(DATA_AREA, params['id'])}.json"
+  @id = params['id']
+  file_name = "#{File.join(DATA_AREA, @id)}.json"
   halt 404 unless File.exist?(file_name)
 
   @article = JSON.load_file(file_name)
