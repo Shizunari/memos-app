@@ -1,0 +1,19 @@
+<header>
+  <h1>編集</h1>
+</header>
+<form action="/memos/<%= @id %>" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch">
+    <div class="form-items">
+      <label for="edit-title">タイトル</label>
+      <input type="text" name="edit_title" placeholder="タイトルを入力" value="<%= @article['title'] %>">
+
+      <label for="edit-content">内容</label>
+      <textarea name="edit_content"><%= @article['content'] %></textarea>
+    </div>
+  <div class="form-action">
+    <input type="submit" value="編集">
+  </div>
+</form>
+
+<div class="moval-link">
+  <a href="/memos">Back to memos</a>
+</div>

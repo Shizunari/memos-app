@@ -1,0 +1,16 @@
+<header>
+  <div class="twin-header">
+    <h1>Memoアプリ</h1>
+    <a class="add-btn" href="/memos/new">新規追加</a>
+  </div>
+</header>
+
+<main>
+  <div class="index-article">
+  <% @articles.each.with_index(1) do |article, i| %>
+    <p><a href="/memos/<%= article[:id] %>"><%= i %></a></p>
+    <p>タイトル: <%= article[:title] %></p>
+    <p>内容: <%= article[:content] %></p>
+  <% end %>
+  </div>
+</main>
