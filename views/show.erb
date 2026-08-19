@@ -9,8 +9,8 @@
     <p><%= @article['content'] %></p>
   </div>
   <div class="twice-container">
-    <a class="edit-btn" href='/memos/<%= @id %>/edit'>編集</a>
-    <form class="delete-btn" action="/memos/<%= @id %>" method="post">
+    <a class="edit-btn" href='/memos/<%= @article['memo_id'] %>/edit'>編集</a>
+    <form class="delete-btn" action="/memos/<%= @article['memo_id'] %>" method="post">
       <input type="hidden" name="_method" value="delete">
       <input type="submit" value="削除">
     </form>

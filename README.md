@@ -1,6 +1,7 @@
 # memos-app
 フィヨルドブートキャンプの課題用リポジトリです。
-sinatraを利用した簡易メモアプリ。DBは使用していません。
+sinatraを利用した簡易メモアプリ。
+PostgreSQLをデータベースに使用します。
 
 ## 概要（Overview）
 メモ（タイトル/内容）を作成するだけのアプリケーションです。
@@ -10,10 +11,14 @@ sinatraを利用した簡易メモアプリ。DBは使用していません。
 プログラム
 - Ruby
 
+データベース
+- PostgreSQL
+
 Gem
 - Sinatra
 - rackup
 - webrick
+- pg
 
 ## インストール手順(Installation)
 1. リポジトリをダウンロード（クローン）します。
@@ -28,13 +33,19 @@ Gem
    ```
    bundle install
    ```
+4. PostgreSQLをインストールしてください。
+
+5. アプリで使用するデータベースを事前に作成してください。
+   ```
+   CREATE DATABASE memos_application_db
+   ```
+   （注）アプリを使用するユーザがデータベースの編集権限を所持していること
 
 ## 使い方（Usage）
 1. プロジェクトのフォルダで次のコマンドを使用しWEBサーバを起動します
    ```
    bundle exec ruby memos_app.rb -p 4567
    ```
-   Localhost以外で使用する場合には、引数で接続範囲を指定（-h 0.0.0.0）
 
 2. `http://localhost:4567/memos` にアクセスして使用します
 

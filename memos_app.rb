@@ -3,33 +3,28 @@
 require 'sinatra'
 require 'json'
 require 'rack/protection'
-require 'securerandom'
+require 'pg'
 
-DATA_AREA = 'resources'
+DATABASE_NAME = 'memos_application_db'
+TABLE_NAME = 'memo_details'
 
 configure do
   use Rack::Protection
   set :erb, escape_html: true
 end
 
-Dir.mkdir(DATA_AREA) unless Dir.exist?(DATA_AREA)
-
-def load_articles(file_id = nil)
-  file_names = Dir.glob(File.join(DATA_AREA, '*.json')).sort_by { |f| File.birthtime(f) }
-  articles = file_names.map do |file_name|
-    id = File.basename(file_name, '.json')
-    article_json = JSON.load_file(file_name)
-    { id:, title: article_json['title'], content: article_json['content'] }
-  end
-
-  return articles unless file_id
-
-  articles.find { |article| article[:id] == file_id }
-end
+conn = PG.connect(dbname: DATABASE_NAME)
+conn.exec(<<~SQL)
+  CREATE TABLE IF NOT EXISTS "#{TABLE_NAME}" (
+    "memo_id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    "title" VARCHAR(255),
+    "content" VARCHAR(5000)
+  )
+SQL
 
 get '/memos' do
-  @articles = load_articles
   @page_title = '一覧表示'
+  @articles = conn.exec("SELECT memo_id, title, content FROM \"#{TABLE_NAME}\" ORDER BY title DESC")
 
   erb :index
 end
@@ -41,57 +36,43 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  file_name = "#{File.join(DATA_AREA, SecureRandom.uuid)}.json"
-  data_content = {
-    title: params[:new_title],
-    content: params[:new_content]
-  }
-  File.write(file_name, JSON.generate(data_content))
+  conn.exec_params(
+    "INSERT INTO \"#{TABLE_NAME}\" (title, content) VALUES ($1, $2)",
+    [params[:new_title], params[:new_content]]
+  )
 
   redirect '/memos'
 end
 
 get '/memos/:id' do
-  @id = params['id']
-  file_name = "#{File.join(DATA_AREA, @id)}.json"
-  halt 404 unless File.exist?(file_name)
-
-  @article = JSON.load_file(file_name)
   @page_title = '個別表示'
+  result = conn.exec_params("SELECT memo_id, title, content FROM \"#{TABLE_NAME}\" WHERE memo_id = $1", [params[:id]])
+  halt 404 if result.ntuples.zero?
+  @article = result.first
 
   erb :show
 end
 
 get '/memos/:id/edit' do
-  @id = params['id']
-  file_name = "#{File.join(DATA_AREA, @id)}.json"
-  halt 404 unless File.exist?(file_name)
-
-  @article = JSON.load_file(file_name)
   @page_title = '編集画面'
+  result = conn.exec_params("SELECT memo_id, title, content FROM \"#{TABLE_NAME}\" WHERE memo_id = $1", [params[:id]])
+  halt 404 if result.ntuples.zero?
+  @article = result.first
 
   erb :edit
 end
 
 patch '/memos/:id' do
-  article = load_articles(params['id'].to_s)
-  halt 404 unless article
-  file_name = "#{File.join(DATA_AREA, article[:id])}.json"
-  data_content = {
-    title: params[:edit_title],
-    content: params[:edit_content]
-  }
-  File.write(file_name, JSON.generate(data_content))
+  conn.exec_params(
+    "UPDATE \"#{TABLE_NAME}\" SET title = $1, content = $2 WHERE memo_id = $3",
+    [params[:edit_title], params[:edit_content], params[:id]]
+  )
 
   redirect "/memos/#{params['id']}"
 end
 
 delete '/memos/:id' do
-  article = load_articles(params['id'].to_s)
-  halt 404 unless article
-  file_name = "#{File.join(DATA_AREA, article[:id])}.json"
-
-  File.delete(file_name)
+  conn.exec_params("DELETE FROM \"#{TABLE_NAME}\" WHERE memo_id = $1", [params[:id]])
 
   redirect '/memos'
 end
