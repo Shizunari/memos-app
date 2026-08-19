@@ -7,10 +7,8 @@
 
 <main>
   <div class="index-article">
-  <% @articles.each.with_index(1) do |article, i| %>
-    <p><a href="/memos/<%= article[:id] %>"><%= i %></a></p>
-    <p>タイトル: <%= article[:title] %></p>
-    <p>内容: <%= article[:content] %></p>
+  <% @articles.each do |article| %>
+    <p><a href="/memos/<%= article["memo_id"] %>">タイトル: <%= article["title"] %></a></p>
   <% end %>
   </div>
 </main>
