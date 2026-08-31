@@ -56,9 +56,9 @@ end
 get '/memos/:id' do
   @page_title = '個別表示'
   halt 404 unless params[:id].match?(UUID_FORMAT)
-  article = load_articles(params[:id].to_s)
-  halt 404 if article.ntuples.zero?
-  @article = article.first
+  articles = load_articles(params[:id].to_s)
+  halt 404 if articles.ntuples.zero?
+  @article = articles.first
 
   erb :show
 end
@@ -66,17 +66,17 @@ end
 get '/memos/:id/edit' do
   @page_title = '編集画面'
   halt 404 unless params[:id].match?(UUID_FORMAT)
-  article = load_articles(params[:id].to_s)
-  halt 404 if article.ntuples.zero?
-  @article = article.first
+  articles = load_articles(params[:id].to_s)
+  halt 404 if articles.ntuples.zero?
+  @article = articles.first
 
   erb :edit
 end
 
 patch '/memos/:id' do
   halt 404 unless params[:id].match?(UUID_FORMAT)
-  article = load_articles(params[:id].to_s)
-  halt 404 if article.ntuples.zero?
+  articles = load_articles(params[:id].to_s)
+  halt 404 if articles.ntuples.zero?
 
   CONN.exec_params(
     "UPDATE \"#{TABLE_NAME}\" SET title = $1, content = $2 WHERE memo_id = $3",
@@ -88,8 +88,8 @@ end
 
 delete '/memos/:id' do
   halt 404 unless params[:id].match?(UUID_FORMAT)
-  article = load_articles(params[:id].to_s)
-  halt 404 if article.ntuples.zero?
+  articles = load_articles(params[:id].to_s)
+  halt 404 if articles.ntuples.zero?
 
   CONN.exec_params("DELETE FROM \"#{TABLE_NAME}\" WHERE memo_id = $1", [params[:id]])
 
